@@ -1,0 +1,27 @@
+---
+title: "Statystyka w analizie danych - projekt 1"
+author: "Michał Belniak, Wojciech Wolny"
+date: "7 11 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(tidyverse)
+```
+
+
+
+```{r reading data}
+df_PLAY = read.csv('PLAY.mst')
+names(df_PLAY) = c('ticker', 'date', 'open', 'high', 'low', 'close', 'vol')
+tibble_PLAY = tibble(df_PLAY)
+head(df_PLAY, 10)
+
+df_VRG = read.csv('VRG.mst')
+names(df_VRG) = c('ticker', 'date', 'open', 'high', 'low', 'close', 'vol')
+
+df_ORANGE = read.csv('ORANGEPL.prn')
+names(df_ORANGE) = c('ticker', 'zero column', 'date', 'time', 'open', 'high', 'low', 'close', 'vol', 'second zero column')
+
+```

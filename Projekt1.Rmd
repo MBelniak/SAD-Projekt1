@@ -8,20 +8,58 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 require(tidyverse)
+require(magrittr)
 ```
 
 
 
-```{r reading data}
+```{r Zadanie 1}
 df_PLAY = read.csv('PLAY.mst')
 names(df_PLAY) = c('ticker', 'date', 'open', 'high', 'low', 'close', 'vol')
-tibble_PLAY = tibble(df_PLAY)
-head(df_PLAY, 10)
+df_PLAY %<>% filter(str_detect(date, "2019\\d{4}"))
+open_changes_PLAY = with(df_PLAY, c(NA, 100*diff(open)/open[1:length(open) - 1]))
 
 df_VRG = read.csv('VRG.mst')
 names(df_VRG) = c('ticker', 'date', 'open', 'high', 'low', 'close', 'vol')
+df_VRG %<>% filter(str_detect(date, "2019\\d{4}"))
+open_changes_VRG = with(df_VRG, c(NA, 100*diff(open)/open[1:length(open) - 1]))
 
+
+hist(open_changes_PLAY,
+     breaks = seq(-10, 10, by = 0.5),
+     prob = T,
+     xlim=c(-10,10),
+     xlab = 'Zmiana kursu otwarcia [%]',
+     ylab = 'Częstość występowania',
+     main = 'Histogram procentowych zmian kursu PLAY')
+
+mean_PLAY = mean(open_changes_PLAY, na.rm = T)
+std_dev_PLAY = sd(open_changes_PLAY, na.rm = T)
+curve(dnorm(x, mean = mean_PLAY, sd = std_dev_PLAY), add = T, col = 'red', -10, 10)
+
+hist(open_changes_VRG,
+     breaks = seq(-10, 10, by = 0.5),
+     prob = T,
+     xlim=c(-10,10),
+     xlab = 'Zmiana kursu otwarcia [%]',
+     ylab = 'Częstość występowania',
+     main = 'Histogram procentowych zmian kursu VRG')
+
+mean_VRG = mean(open_changes_VRG, na.rm = T)
+std_dev_VRG = sd(open_changes_VRG, na.rm = T)
+curve(dnorm(x, mean = mean_VRG, sd = std_dev_VRG), add = T, col = 'red', -10, 10)
+
+boxplot(open_changes_PLAY, open_changes_VRG,
+        xlab = 'Zmiana kursu otwarcia [%]',
+        names = c('PLAY', 'VRG'),
+        main = 'Porównanie - PLAY i VRG',
+        horizontal = TRUE)
+grid()
+
+```
+
+
+```{r Zadanie 2}
 df_ORANGE = read.csv('ORANGEPL.prn')
 names(df_ORANGE) = c('ticker', 'zero column', 'date', 'time', 'open', 'high', 'low', 'close', 'vol', 'second zero column')
-
 ```

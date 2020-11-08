@@ -12,19 +12,22 @@ require(magrittr)
 ```
 
 
+#### Zadanie 1a - wyznaczenie procentowych zmian kursow otwarcia:
 
-```{r Zadanie 1}
+```{r Zadanie 1a}
 df_PLAY = read.csv('PLAY.mst')
 names(df_PLAY) = c('ticker', 'date', 'open', 'high', 'low', 'close', 'vol')
-df_PLAY %<>% filter(str_detect(date, "2019\\d{4}"))
 open_changes_PLAY = with(df_PLAY, c(NA, 100*diff(open)/open[1:length(open) - 1]))
 
 df_VRG = read.csv('VRG.mst')
 names(df_VRG) = c('ticker', 'date', 'open', 'high', 'low', 'close', 'vol')
-df_VRG %<>% filter(str_detect(date, "2019\\d{4}"))
 open_changes_VRG = with(df_VRG, c(NA, 100*diff(open)/open[1:length(open) - 1]))
+```
 
 
+#### Zadanie 1b - stworzenie histogramow oraz wykresow pudelkowych zmian kursow otwarcia:
+
+```{r Zadanie 1b}
 hist(open_changes_PLAY,
      breaks = seq(-10, 10, by = 0.5),
      prob = T,
@@ -32,10 +35,6 @@ hist(open_changes_PLAY,
      xlab = 'Zmiana kursu otwarcia [%]',
      ylab = 'Częstość występowania',
      main = 'Histogram procentowych zmian kursu PLAY')
-
-mean_PLAY = mean(open_changes_PLAY, na.rm = T)
-std_dev_PLAY = sd(open_changes_PLAY, na.rm = T)
-curve(dnorm(x, mean = mean_PLAY, sd = std_dev_PLAY), add = T, col = 'red', -10, 10)
 
 hist(open_changes_VRG,
      breaks = seq(-10, 10, by = 0.5),
@@ -45,10 +44,6 @@ hist(open_changes_VRG,
      ylab = 'Częstość występowania',
      main = 'Histogram procentowych zmian kursu VRG')
 
-mean_VRG = mean(open_changes_VRG, na.rm = T)
-std_dev_VRG = sd(open_changes_VRG, na.rm = T)
-curve(dnorm(x, mean = mean_VRG, sd = std_dev_VRG), add = T, col = 'red', -10, 10)
-
 boxplot(open_changes_PLAY, open_changes_VRG,
         xlab = 'Zmiana kursu otwarcia [%]',
         names = c('PLAY', 'VRG'),
@@ -56,6 +51,44 @@ boxplot(open_changes_PLAY, open_changes_VRG,
         horizontal = TRUE)
 grid()
 
+```
+
+#### Zadanie 1c - estymacja parametrow rozkladow normalnych: 
+
+```{r Zadanie 1c}
+mean_PLAY = mean(open_changes_PLAY, na.rm = T)
+std_dev_PLAY = sd(open_changes_PLAY, na.rm = T)
+
+mean_VRG = mean(open_changes_VRG, na.rm = T)
+std_dev_VRG = sd(open_changes_VRG, na.rm = T)
+```
+
+Dla spólki PLAY wyestymowane parametry rozkladu normalnego postaci $\mathcal{N}(μ, \sigma^2)$ wynosza: $$μ = `r mean_PLAY`$$ $$\sigma = `r std_dev_PLAY`$$
+
+Dla spólki VRG wyestymowane parametry rozkladu normalnego postaci $\mathcal{N}(μ, \sigma^2)$ wynosza: $$μ = `r mean_VRG`$$ $$\sigma = `r std_dev_VRG`$$
+
+#### Zadanie 1d - graficzne porównanie histogramow oraz wyestymowanych rozkladow normalnych:
+
+```{r Zadanie 1d}
+hist(open_changes_PLAY,
+     breaks = seq(-10, 10, by = 0.5),
+     prob = T,
+     xlim=c(-10,10),
+     xlab = 'Zmiana kursu otwarcia [%]',
+     ylab = 'Częstość występowania',
+     main = 'Histogram procentowych zmian kursu PLAY\n oraz estymowany rozklad normalny')
+
+curve(dnorm(x, mean = mean_PLAY, sd = std_dev_PLAY), add = T, col = 'red', -10, 10)
+
+hist(open_changes_VRG,
+     breaks = seq(-10, 10, by = 0.5),
+     prob = T,
+     xlim=c(-10,10),
+     xlab = 'Zmiana kursu otwarcia [%]',
+     ylab = 'Częstość występowania',
+     main = 'Histogram procentowych zmian kursu VRG\n oraz estymowany rozklad normalny')
+
+curve(dnorm(x, mean = mean_VRG, sd = std_dev_VRG), add = T, col = 'red', -10, 10)
 ```
 
 

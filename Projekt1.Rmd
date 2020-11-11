@@ -12,7 +12,7 @@ require(magrittr)
 ```
 
 
-#### Zadanie 1a - wyznaczenie procentowych zmian kursow otwarcia:
+#### Zadanie 1a - wyznaczenie procentowych zmian kursów otwarcia:
 
 ```{r Zadanie 1a}
 df_PLAY = read.csv('PLAY.mst')
@@ -25,7 +25,7 @@ open_changes_VRG = with(df_VRG, c(NA, 100*diff(open)/open[1:length(open) - 1]))
 ```
 
 
-#### Zadanie 1b - stworzenie histogramow oraz wykresow pudelkowych zmian kursow otwarcia:
+#### Zadanie 1b - stworzenie histogramów oraz wykresów pudełkowych zmian kursów otwarcia:
 
 ```{r Zadanie 1b}
 hist(open_changes_PLAY,
@@ -53,7 +53,7 @@ grid()
 
 ```
 
-#### Zadanie 1c - estymacja parametrow rozkladow normalnych: 
+#### Zadanie 1c - estymacja parametrów rozkładw normalnych: 
 
 ```{r Zadanie 1c}
 mean_PLAY = mean(open_changes_PLAY, na.rm = T)
@@ -63,11 +63,11 @@ mean_VRG = mean(open_changes_VRG, na.rm = T)
 std_dev_VRG = sd(open_changes_VRG, na.rm = T)
 ```
 
-Dla spólki PLAY wyestymowane parametry rozkladu normalnego postaci $\mathcal{N}(μ, \sigma^2)$ wynosza: $$μ = `r mean_PLAY`$$ $$\sigma = `r std_dev_PLAY`$$
+Dla spółki PLAY wyestymowane parametry rozkładu normalnego postaci $\mathcal{N}(μ, \sigma^2)$ wynoszą: $$μ = `r mean_PLAY`$$ $$\sigma = `r std_dev_PLAY`$$
 
-Dla spólki VRG wyestymowane parametry rozkladu normalnego postaci $\mathcal{N}(μ, \sigma^2)$ wynosza: $$μ = `r mean_VRG`$$ $$\sigma = `r std_dev_VRG`$$
+Dla spółki VRG wyestymowane parametry rozkładu normalnego postaci $\mathcal{N}(μ, \sigma^2)$ wynoszą: $$μ = `r mean_VRG`$$ $$\sigma = `r std_dev_VRG`$$
 
-#### Zadanie 1d - graficzne porównanie histogramow oraz wyestymowanych rozkladow normalnych:
+#### Zadanie 1d - graficzne porównanie histogramów oraz wyestymowanych rozkładów normalnych:
 
 ```{r Zadanie 1d}
 hist(open_changes_PLAY,
@@ -76,7 +76,7 @@ hist(open_changes_PLAY,
      xlim=c(-10,10),
      xlab = 'Zmiana kursu otwarcia [%]',
      ylab = 'Częstość występowania',
-     main = 'Histogram procentowych zmian kursu PLAY\n oraz estymowany rozklad normalny')
+     main = 'Histogram procentowych zmian kursu PLAY\n oraz estymowany rozkład normalny')
 
 curve(dnorm(x, mean = mean_PLAY, sd = std_dev_PLAY), add = T, col = 'red', -10, 10)
 
@@ -86,7 +86,7 @@ hist(open_changes_VRG,
      xlim=c(-10,10),
      xlab = 'Zmiana kursu otwarcia [%]',
      ylab = 'Częstość występowania',
-     main = 'Histogram procentowych zmian kursu VRG\n oraz estymowany rozklad normalny')
+     main = 'Histogram procentowych zmian kursu VRG\n oraz estymowany rozkład normalny')
 
 curve(dnorm(x, mean = mean_VRG, sd = std_dev_VRG), add = T, col = 'red', -10, 10)
 ```
@@ -95,4 +95,78 @@ curve(dnorm(x, mean = mean_VRG, sd = std_dev_VRG), add = T, col = 'red', -10, 10
 ```{r Zadanie 2}
 df_ORANGE = read.csv('ORANGEPL.prn')
 names(df_ORANGE) = c('ticker', 'zero column', 'date', 'time', 'open', 'high', 'low', 'close', 'vol', 'second zero column')
+df_ORANGE_09 = df_ORANGE[20200901 <= df_ORANGE$date & df_ORANGE$date < 20201001, ]
+df_ORANGE_09_25_12 = df_ORANGE[20200925 == df_ORANGE$date & df_ORANGE$time >= 120000 & df_ORANGE$time < 140000, ]
+```
+
+### Zadanie 2 Przedstawienie wyników dla spółki Orange we wrześniu 2020.
+
+#### Zadanie 2a Przedstawienie liczby transakcji akcji spółki Orange.
+
+```{r Zadanie 2a}
+faza_otw = nrow(df_ORANGE_09[df_ORANGE_09$time <= 91500, ])
+faza_zam = nrow(df_ORANGE_09[df_ORANGE_09$time >= 164500, ])
+faza_not_ciagle = nrow(df_ORANGE_09[df_ORANGE_09$time > 91500 & df_ORANGE_09$time < 164500, ])
+fazy_notow <- data.frame(c(faza_otw, faza_not_ciagle, faza_zam), row.names = c('faza otwarcia', 'notowanie ciągłe', 'faza zamknięcia'))
+
+```
+
+Zakładam, że faza otwarcia trwa od 9:00 do 9:15, a faza zamknięcia od 16:45 do końca dnia.
+
+```{r Zadanie 2ai}
+barplot(c(faza_otw, faza_not_ciagle, faza_zam),
+        names.arg = c('faza otwarcia', 'notowanie ciągłe', 'faza zamknięcia'),
+        ylab = "liczba transakcji",
+        xlab = "faza",
+        main = "Liczby transakcji dla kolejnych faz giełdy we wrześniu 2020")
+```
+
+
+```{r Zadanie 2aii}
+mat_ora = matrix(nrow = 9, ncol = 30)
+for (i in 1:30){
+        for (j in 9:17){
+                mat_ora[j-8, i] <- nrow(df_ORANGE_09[df_ORANGE_09$date == 20200900+i & df_ORANGE_09$time >=j*10000 & df_ORANGE_09$time < (j+1)*10000,])
+        }
+}
+mat_ora = mat_ora[,colSums(mat_ora != 0) > 0]
+trans_nr_h_ORA = with(df_ORANGE_09, df_ORANGE_09$time%/%10000)
+hist(trans_nr_h_ORA,
+        ylab = "liczba transakcji",
+        xlab = "Godzina",
+        main = "Liczby transakcji dla kolejnych godzin pracy giełdy we wrześniu 2020")
+
+boxplot(t(mat_ora),
+        xlab = 'Liczba transakcji',
+        names = c(9:17),
+        main = 'Porównanie rozkładu transakcji w trakcie dnia',
+        horizontal = TRUE)
+```
+
+#### Zadanie 2b Przedstawienie wyników dla spółki Orange 25 września 2020 w przedziale czasowym od 12:00 do 14:00.
+```{r Zadanie 2b}
+trans_min_ORA = with(df_ORANGE_09_25_12, ifelse((df_ORANGE_09_25_12$time - 120000)%/%100 > 60, (df_ORANGE_09_25_12$time - 120000)%/%100 - 40, (df_ORANGE_09_25_12$time - 120000)%/%100))
+N = length(trans_min_ORA)
+L = 120
+table_trans_min_ORA = tabulate(trans_min_ORA)
+table_trans_min_ORA <- append(table_trans_min_ORA, 0, 0)
+table_trans_min_ORA = setNames(table_trans_min_ORA, 1:120)
+
+print(table_trans_min_ORA)
+
+lambda = mean(trans_min_ORA)
+```
+
+Dla spółki Orange wyestymowany parametr lambda rozkładu Poissona wynosi: $$\lambda = `r lambda`$$
+
+```{r Zadanie 2biii, warning= FALSE}
+hist(trans_min_ORA,
+     breaks=120,
+     prob=T,
+     xlim=c(0,120),
+     xlab = 'Minuta od 12:00 25 września 2020',
+     ylab = 'Liczba transakcji',
+     main = 'Liczby transakcji w kolejnych minutach od 12 do 14 25 września 2020'
+     )
+curve(dpois(x,  lambda = lambda), add = T, col = 'red',0,120)
 ```

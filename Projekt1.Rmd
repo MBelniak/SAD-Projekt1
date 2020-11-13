@@ -117,8 +117,8 @@ Zakładam, że faza fixingu otwarcia otwarcia dotyczy wyłącznie transakcji o r
 ```{r Zadanie 2ai}
 barplot(c(len_faza_otw, len_faza_not_ciagle, len_faza_zam),
         names.arg = c('faza otwarcia', 'notowanie ciągłe', 'faza zamknięcia'),
-        ylab = "liczba transakcji",
-        xlab = "faza",
+        ylab = "Liczba transakcji",
+        xlab = "Faza",
         main = "Liczby transakcji dla kolejnych faz giełdy we wrześniu 2020")
 ```
 
@@ -140,6 +140,7 @@ hist(trans_nr_h_ORA,
 
 boxplot(t(mat_ora),
         xlab = 'Liczba transakcji',
+        ylab='Godzina dnia',
         names = c(9:16),
         main = 'Porównanie rozkładu transakcji w fazie notowań ciągłych',
         horizontal = TRUE)
@@ -157,8 +158,6 @@ hist(trans_nr_min_ORA,
 #### Zadanie 2b Przedstawienie wyników dla spółki Orange 25 września 2020 w przedziale czasowym od 12:00 do 14:00.
 ```{r Zadanie 2b}
 trans_min_ORA = with(df_ORANGE_09_25_12, ifelse((df_ORANGE_09_25_12$time - 120000)%/%100 > 60, (df_ORANGE_09_25_12$time - 120000)%/%100 - 40, (df_ORANGE_09_25_12$time - 120000)%/%100))
-N = length(trans_min_ORA)
-L = 120
 table_trans_min_ORA = tabulate(trans_min_ORA)
 table_trans_min_ORA <- append(table_trans_min_ORA, 0, 0)
 table_trans_min_ORA = setNames(table_trans_min_ORA, 1:120)
@@ -176,8 +175,8 @@ hist(trans_min_ORA,
      prob=T,
      xlim=c(0,120),
      xlab = 'Minuta od 12:00 25 września 2020',
-     ylab = 'Liczba transakcji',
-     main = 'Liczby transakcji w kolejnych minutach od 12 do 14 25 września 2020'
+     ylab = 'Gęstość transakcji',
+     main = 'Gęstość transakcji w kolejnych minutach od 12 do 14 25 września 2020'
      )
 curve(dpois(x,  lambda = lambda), add = T, col = 'red',0,120)
 ```

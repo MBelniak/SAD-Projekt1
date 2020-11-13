@@ -131,9 +131,11 @@ for (i in 1:30){
         }
 }
 mat_ora = mat_ora[,colSums(mat_ora != 0) > 0]
-trans_nr_h_ORA = with(df_faza_not_ciagle, df_faza_not_ciagle$time%/%10000)
+trans_nr_h_ORA = with(df_faza_not_ciagle, df_faza_not_ciagle$time%/%10000 + 0.1)
 hist(trans_nr_h_ORA,
-     prob=T,
+        prob=T,
+        breaks = seq(9, 17, 1),
+        xlim = c(9, 17),
         ylab = "Gęstość transakcji",
         xlab = "Godzina",
         main = "Gęstość transakcji dla kolejnych godzin pracy giełdy we wrześniu 2020")

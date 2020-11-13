@@ -104,17 +104,18 @@ df_ORANGE_09_25_12 = df_ORANGE[20200925 == df_ORANGE$date & df_ORANGE$time >= 12
 #### Zadanie 2a Przedstawienie liczby transakcji akcji spółki Orange.
 
 ```{r Zadanie 2a}
-faza_otw = nrow(df_ORANGE_09[df_ORANGE_09$time <= 91500, ])
-faza_zam = nrow(df_ORANGE_09[df_ORANGE_09$time >= 164500, ])
-faza_not_ciagle = nrow(df_ORANGE_09[df_ORANGE_09$time > 91500 & df_ORANGE_09$time < 164500, ])
-fazy_notow <- data.frame(c(faza_otw, faza_not_ciagle, faza_zam), row.names = c('faza otwarcia', 'notowanie ciągłe', 'faza zamknięcia'))
+len_faza_otw = nrow(df_ORANGE_09[df_ORANGE_09$time <= 90000, ])
+len_faza_zam = nrow(df_ORANGE_09[df_ORANGE_09$time >= 170000, ])
+len_faza_not_ciagle = nrow(df_ORANGE_09[df_ORANGE_09$time > 90000 & df_ORANGE_09$time < 170000, ])
+df_faza_not_ciagle = df_ORANGE_09[df_ORANGE_09$time > 90000 & df_ORANGE_09$time < 170000, ]
+fazy_notow <- data.frame(c(len_faza_otw, len_faza_not_ciagle, len_faza_zam), row.names = c('faza otwarcia', 'notowanie ciągłe', 'faza zamknięcia'))
 
 ```
 
-Zakładam, że faza otwarcia trwa od 9:00 do 9:15, a faza zamknięcia od 16:45 do końca dnia.
+Zakładam, że faza fixingu otwarcia otwarcia dotyczy wyłącznie transakcji o równo 9:00:00, a faza fixingu zamknięcia to wszystkie transakcje po 17:00:00.
 
 ```{r Zadanie 2ai}
-barplot(c(faza_otw, faza_not_ciagle, faza_zam),
+barplot(c(len_faza_otw, len_faza_not_ciagle, len_faza_zam),
         names.arg = c('faza otwarcia', 'notowanie ciągłe', 'faza zamknięcia'),
         ylab = "liczba transakcji",
         xlab = "faza",
@@ -123,24 +124,34 @@ barplot(c(faza_otw, faza_not_ciagle, faza_zam),
 
 
 ```{r Zadanie 2aii}
-mat_ora = matrix(nrow = 9, ncol = 30)
+mat_ora = matrix(nrow = 8, ncol = 30)
 for (i in 1:30){
-        for (j in 9:17){
-                mat_ora[j-8, i] <- nrow(df_ORANGE_09[df_ORANGE_09$date == 20200900+i & df_ORANGE_09$time >=j*10000 & df_ORANGE_09$time < (j+1)*10000,])
+        for (j in 9:16){
+                mat_ora[j-8, i] <- nrow(df_faza_not_ciagle[df_faza_not_ciagle$date == 20200900+i & df_faza_not_ciagle$time >=j*10000 & df_faza_not_ciagle$time < (j+1)*10000,])
         }
 }
 mat_ora = mat_ora[,colSums(mat_ora != 0) > 0]
-trans_nr_h_ORA = with(df_ORANGE_09, df_ORANGE_09$time%/%10000)
+trans_nr_h_ORA = with(df_faza_not_ciagle, df_faza_not_ciagle$time%/%10000)
 hist(trans_nr_h_ORA,
-        ylab = "liczba transakcji",
+     prob=T,
+        ylab = "Gęstość transakcji",
         xlab = "Godzina",
-        main = "Liczby transakcji dla kolejnych godzin pracy giełdy we wrześniu 2020")
+        main = "Gęstość transakcji dla kolejnych godzin pracy giełdy we wrześniu 2020")
 
 boxplot(t(mat_ora),
         xlab = 'Liczba transakcji',
-        names = c(9:17),
-        main = 'Porównanie rozkładu transakcji w trakcie dnia',
+        names = c(9:16),
+        main = 'Porównanie rozkładu transakcji w fazie notowań ciągłych',
         horizontal = TRUE)
+
+
+
+trans_nr_min_ORA = with(df_faza_not_ciagle, strptime(sprintf("%06d",df_faza_not_ciagle$time),format='%H%M%S'))
+hist(trans_nr_min_ORA,
+     breaks = "mins",
+     main="Histogram transakcji w trakcie dnia dla spółki Orange we wrześniu 2020",
+     xlab="Czas dnia",
+     ylab="Gęstość transakcji")
 ```
 
 #### Zadanie 2b Przedstawienie wyników dla spółki Orange 25 września 2020 w przedziale czasowym od 12:00 do 14:00.

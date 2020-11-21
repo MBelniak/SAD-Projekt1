@@ -93,10 +93,8 @@ curve(dnorm(x, mean = mean_VRG, sd = std_dev_VRG), add = T, col = 'red', -10, 10
 
 
 ```{r Zadanie 2}
-df_ORANGE = read.csv('ORANGEPL.prn')
-names(df_ORANGE) = c('ticker', 'zero column', 'date', 'time', 'open', 'high', 'low', 'close', 'vol', 'second zero column')
-df_ORANGE_09 = df_ORANGE[20200901 <= df_ORANGE$date & df_ORANGE$date < 20201001, ]
-df_ORANGE_09_25_12 = df_ORANGE[20200925 == df_ORANGE$date & df_ORANGE$time >= 120000 & df_ORANGE$time < 140000, ]
+df_ORANGE_09 = read.csv('ORANGEPL_09.csv')
+df_ORANGE_09_25_12 = df_ORANGE_09[20200925 == df_ORANGE_09$date & df_ORANGE_09$time >= 120000 & df_ORANGE_09$time < 140000, ]
 ```
 
 ### Zadanie 2 Przedstawienie wyników dla spółki Orange we wrześniu 2020.
@@ -125,17 +123,15 @@ barplot(c(len_faza_otw, len_faza_not_ciagle, len_faza_zam),
 
 ```{r Zadanie 2aii}
 mat_ora = matrix(nrow = 8, ncol = 30)
-sum_vol_hour_by_hour = vector(length = 8)
 for (i in 1:30){
         for (j in 9:16){
                 mat_ora[j-8, i] <- sum(df_faza_not_ciagle[df_faza_not_ciagle$date == 20200900+i & df_faza_not_ciagle$time >=j*10000 & df_faza_not_ciagle$time < (j+1)*10000,]$vol)
-                sum_vol_hour_by_hour[j-8] = sum_vol_hour_by_hour[j-8] + mat_ora[j-8, i]
         }
 }
 mat_ora = mat_ora[,colSums(mat_ora != 0) > 0]
 df_faza_not_ciagle$time <- df_faza_not_ciagle$time%/%10000
 
-barplot(sum_vol_hour_by_hour,
+barplot(rowSums(mat_ora),
         names.arg = seq(9, 16, 1),
         ylab = "Wolumen",
         xlab = "Godzina",

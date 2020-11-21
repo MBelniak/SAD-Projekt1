@@ -104,22 +104,22 @@ df_ORANGE_09_25_12 = df_ORANGE[20200925 == df_ORANGE$date & df_ORANGE$time >= 12
 #### Zadanie 2a Przedstawienie liczby transakcji akcji spółki Orange.
 
 ```{r Zadanie 2a}
-len_faza_otw = nrow(df_ORANGE_09[df_ORANGE_09$time <= 90000, ])
-len_faza_zam = nrow(df_ORANGE_09[df_ORANGE_09$time >= 170000, ])
-len_faza_not_ciagle = nrow(df_ORANGE_09[df_ORANGE_09$time > 90000 & df_ORANGE_09$time < 170000, ])
-df_faza_not_ciagle = df_ORANGE_09[df_ORANGE_09$time > 90000 & df_ORANGE_09$time < 170000, ]
+len_faza_otw = sum(df_ORANGE_09[df_ORANGE_09$time <= 90001, ]$vol)
+len_faza_zam = sum(df_ORANGE_09[df_ORANGE_09$time >= 170000, ]$vol)
+len_faza_not_ciagle = sum(df_ORANGE_09[df_ORANGE_09$time > 90001 & df_ORANGE_09$time < 170000, ]$vol)
+df_faza_not_ciagle = df_ORANGE_09[df_ORANGE_09$time > 90001 & df_ORANGE_09$time < 170000, ]
 fazy_notow <- data.frame(c(len_faza_otw, len_faza_not_ciagle, len_faza_zam), row.names = c('faza otwarcia', 'notowanie ciągłe', 'faza zamknięcia'))
 
 ```
 
-Zakładam, że faza fixingu otwarcia otwarcia dotyczy wyłącznie transakcji o równo 9:00:00, a faza fixingu zamknięcia to wszystkie transakcje po 17:00:00.
+Zakładam, że faza fixingu otwarcia otwarcia dotyczy wyłącznie transakcji o równo 9:00:01, a faza fixingu zamknięcia to wszystkie transakcje po 17:00:00.
 
 ```{r Zadanie 2ai}
 barplot(c(len_faza_otw, len_faza_not_ciagle, len_faza_zam),
         names.arg = c('faza otwarcia', 'notowanie ciągłe', 'faza zamknięcia'),
-        ylab = "Liczba transakcji",
+        ylab = "Wolumen transakcji",
         xlab = "Faza",
-        main = "Liczby transakcji dla kolejnych faz giełdy we wrześniu 2020")
+        main = "Wolumen transakcji dla kolejnych faz giełdy we wrześniu 2020")
 ```
 
 
@@ -127,7 +127,7 @@ barplot(c(len_faza_otw, len_faza_not_ciagle, len_faza_zam),
 mat_ora = matrix(nrow = 8, ncol = 30)
 for (i in 1:30){
         for (j in 9:16){
-                mat_ora[j-8, i] <- nrow(df_faza_not_ciagle[df_faza_not_ciagle$date == 20200900+i & df_faza_not_ciagle$time >=j*10000 & df_faza_not_ciagle$time < (j+1)*10000,])
+                mat_ora[j-8, i] <- sum(df_faza_not_ciagle[df_faza_not_ciagle$date == 20200900+i & df_faza_not_ciagle$time >=j*10000 & df_faza_not_ciagle$time < (j+1)*10000,]$vol)
         }
 }
 mat_ora = mat_ora[,colSums(mat_ora != 0) > 0]
@@ -141,10 +141,10 @@ hist(trans_nr_h_ORA,
         main = "Gęstość transakcji dla kolejnych godzin pracy giełdy we wrześniu 2020")
 
 boxplot(t(mat_ora),
-        xlab = 'Liczba transakcji',
+        xlab = 'Wolumen transakcji dla godziny',
         ylab='Godzina dnia',
         names = c(9:16),
-        main = 'Porównanie rozkładu transakcji w fazie notowań ciągłych',
+        main = 'Porównanie rozkładu volumenu w fazie notowań ciągłych',
         horizontal = TRUE)
 
 

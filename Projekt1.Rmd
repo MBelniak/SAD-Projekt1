@@ -125,20 +125,22 @@ barplot(c(len_faza_otw, len_faza_not_ciagle, len_faza_zam),
 
 ```{r Zadanie 2aii}
 mat_ora = matrix(nrow = 8, ncol = 30)
+sum_vol_hour_by_hour = vector(length = 8)
 for (i in 1:30){
         for (j in 9:16){
                 mat_ora[j-8, i] <- sum(df_faza_not_ciagle[df_faza_not_ciagle$date == 20200900+i & df_faza_not_ciagle$time >=j*10000 & df_faza_not_ciagle$time < (j+1)*10000,]$vol)
+                sum_vol_hour_by_hour[j-8] = sum_vol_hour_by_hour[j-8] + mat_ora[j-8, i]
         }
 }
 mat_ora = mat_ora[,colSums(mat_ora != 0) > 0]
-trans_nr_h_ORA = with(df_faza_not_ciagle, df_faza_not_ciagle$time%/%10000 + 0.1)
-hist(trans_nr_h_ORA,
-        prob=T,
-        breaks = seq(9, 17, 1),
-        xlim = c(9, 17),
-        ylab = "Gęstość transakcji",
+df_faza_not_ciagle$time <- df_faza_not_ciagle$time%/%10000
+
+barplot(sum_vol_hour_by_hour,
+        names.arg = seq(9, 16, 1),
+        ylab = "Wolumen",
         xlab = "Godzina",
-        main = "Gęstość transakcji dla kolejnych godzin pracy giełdy we wrześniu 2020")
+        main = "Suma wolumenu transakcji w poszczególnych godzinach")
+
 
 boxplot(t(mat_ora),
         xlab = 'Wolumen transakcji dla godziny',
@@ -146,15 +148,6 @@ boxplot(t(mat_ora),
         names = c(9:16),
         main = 'Porównanie rozkładu volumenu w fazie notowań ciągłych',
         horizontal = TRUE)
-
-
-
-trans_nr_min_ORA = with(df_faza_not_ciagle, strptime(sprintf("%06d",df_faza_not_ciagle$time),format='%H%M%S'))
-hist(trans_nr_min_ORA,
-     breaks = "mins",
-     main="Histogram transakcji w trakcie dnia dla spółki Orange we wrześniu 2020",
-     xlab="Czas dnia",
-     ylab="Gęstość transakcji")
 ```
 
 #### Zadanie 2b Przedstawienie wyników dla spółki Orange 25 września 2020 w przedziale czasowym od 12:00 do 14:00.
